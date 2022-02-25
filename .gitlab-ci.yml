@@ -1,0 +1,66 @@
+stages:
+  - deploy
+  - develop
+
+before_script:
+  - echo "---------STARTING WORK------------"
+step-develop:
+  stage: deploy
+  only:
+    - develop
+  script:
+    - rm -rf ~/api/develop
+    - mkdir -p ~/api/develop
+    - sudo chown -R gitlab-runner:gitlab-runner ~/api
+    - cp .env.develop env
+    - cp -rR *  ~/api/develop/
+    - cd ~/api/develop
+    - ls -la
+    - cp env .env
+    - rm -f env
+    - docker stop php-develop || true && docker rm php-develop || true
+    - docker stop phpmyadmin-develop || true && docker rm phpmyadmin-develop || true
+    - docker stop redis-develop || true && docker rm redis-develop || true
+    - docker stop mysql-develop || true && docker rm mysql-develop || true
+    - docker stop nginx-develop || true && docker rm nginx-develop || true
+    - sudo docker-compose build
+    - sudo docker-compose up -d
+    - docker ps
+    - pwd
+    - ls -la
+    - docker exec -i php-develop composer install
+    - sudo chown -R gitlab-runner:gitlab-runner ~/api
+    - docker exec -i php-develop php artisan migrate
+    - ./cmd develop
+step-deploy-prod:
+  stage: deploy
+  only:
+    - master
+  script:
+    - rm -rf ~/api/master
+    - mkdir -p ~/api/master
+    - sudo chown -R gitlab-runner:gitlab-runner ~/api
+    - cp .env.master env
+    - cp -rR *  ~/api/master/
+    - cd ~/api/master
+    - ls -la
+    - ls -la
+    - cp env .env
+    - rm -f env
+    - docker stop php-master || true && docker rm php-master || true
+    - docker stop phpmyadmin-master || true && docker rm phpmyadmin-master || true
+    - docker stop redis-master || true && docker rm redis-master || true
+    - docker stop mysql-master || true && docker rm mysql-master || true
+    - docker stop nginx-master || true && docker rm nginx-master || true
+    - sudo docker-compose build
+    - sudo docker-compose up -d
+    - docker ps
+    - pwd
+    - ls -la
+    - docker exec -i php-master composer install
+    - sudo chown -R gitlab-runner:gitlab-runner ~/api
+    - docker exec -i php-master php artisan migrate
+    - ./cmd master
+  when: manual
+  allow_failure: false
+
