@@ -1,1 +1,13 @@
 # laravel-dokcer-compose-example
+- add this files to root of your laravel poject 
+- if not using gitlab ci/cd you can remove .gitlab-ci.yml file and add another or nothing
+- if you are using another version of php like 7.4 you must add this runtime to ./docker-files/runtimes directory
+- in your local machine you can run below command for run your laravel project
+- docker-compose build
+- docker-compose up -d
+- if you not using ci/cd you can delete cmd bash file also
+- in your local machine you can change nginx, phpmyadmin, redis, mysql port that mention in .env file
+- NGINX_PORT=85 nginx port
+- PHPMYADMIN_PORT=8585 phpmyadmin port
+- FORWARD_DB_PORT=3406 mysql port
+- FORWARD_REDIS_PORT=6479 redis port
